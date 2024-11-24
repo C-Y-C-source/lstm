@@ -1,4 +1,5 @@
 absl-py==2.1.0
+yfinance
 aiofiles==23.2.1
 aiohappyeyeballs==2.3.5
 aiohttp==3.10.2
