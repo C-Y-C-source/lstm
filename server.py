@@ -419,6 +419,7 @@ text_input = st.text_input(
 
 )
 
+import googletrans
 if text_input:
     from translate import Translator
     label_decoding = {0:'negative', 1:'positive'}
@@ -443,10 +444,10 @@ if text_input:
 
     # 示例輸入
     user_input=text_input
-    translator = Translator(to_lang="en")
-    user_input = translator.translate(user_input)
+    translation = translator.translate(user_input, src='zh-tw',dest='en') 
+    user_input = translation.text
 
-    user_input=user_input
+    
     tokenizer = get_tokenizer('basic_english')
     ans=predict_sentiment(user_input)
     if(ans=='positive'):{
