@@ -444,7 +444,7 @@ if text_input:
     user_input = text_input  # 假設 text_input 是用戶輸入的文本
     
     # 使用 deep-translator 進行翻譯，從繁體中文翻譯到英文
-    translation = GoogleTranslator(source='zh', target='en').translate(user_input)
+    translation = GoogleTranslator(source='zh-TW', target='en').translate(user_input)
     user_input = translation  # 更新為翻譯後的文本
 
     
