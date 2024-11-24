@@ -418,10 +418,8 @@ text_input = st.text_input(
     disabled=False,
 
 )
-
-import googletrans
 if text_input:
-    from translate import Translator
+    from deep_translator import GoogleTranslator
     label_decoding = {0:'negative', 1:'positive'}
    
     def predict_sentiment(text):
@@ -442,10 +440,12 @@ if text_input:
         return label_decoding[int(pred)]
         #print('Pred Label:',label_decoding[int(pred)])             # 顯示文字 
 
-    # 示例輸入
-    user_input=text_input
-    translation = translator.translate(user_input, src='zh-tw',dest='en') 
-    user_input = translation.text
+        # 示例輸入
+    user_input = text_input  # 假設 text_input 是用戶輸入的文本
+    
+    # 使用 deep-translator 進行翻譯，從繁體中文翻譯到英文
+    translation = GoogleTranslator(source='zh', target='en').translate(user_input)
+    user_input = translation  # 更新為翻譯後的文本
 
     
     tokenizer = get_tokenizer('basic_english')
