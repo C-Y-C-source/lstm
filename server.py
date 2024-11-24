@@ -444,7 +444,7 @@ if text_input:
     # 示例輸入
     client = translate.Client()
     user_input=text_input
-    result  =  client.translate(text, target_language="en")
+    result  =  client.translate(user_input, target_language="en")
     user_input=result["translatedText"].text
     tokenizer = get_tokenizer('basic_english')
     ans=predict_sentiment(user_input)
