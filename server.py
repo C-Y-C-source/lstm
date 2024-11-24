@@ -420,7 +420,7 @@ text_input = st.text_input(
 )
 
 if text_input:
-
+    from translate import Translator
     label_decoding = {0:'negative', 1:'positive'}
    
     def predict_sentiment(text):
@@ -442,10 +442,11 @@ if text_input:
         #print('Pred Label:',label_decoding[int(pred)])             # 顯示文字 
 
     # 示例輸入
-    client = translate.Client()
     user_input=text_input
-    result  =  client.translate(user_input, target_language="en")
-    user_input=result["translatedText"].text
+    translator = Translator(to_lang="en")
+    user_input = translator.translate(user_input)
+
+    user_input=user_input
     tokenizer = get_tokenizer('basic_english')
     ans=predict_sentiment(user_input)
     if(ans=='positive'):{
