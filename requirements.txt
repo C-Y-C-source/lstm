@@ -37,6 +37,7 @@ distlib==0.3.8
 dnspython==2.6.1
 docopt==0.6.2
 dv==1.0.12
+translate
 email_validator==2.2.0
 exceptiongroup==1.2.2
 executing==2.0.1
