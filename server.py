@@ -38,7 +38,7 @@ import os
 import pandas as pd
 import torch
 from collections import Counter
-from googletrans import Translator
+
 # 模型載入
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 @st.cache_resource 
@@ -317,7 +317,7 @@ if clicked3:
 
 
 uploaded_file = st.file_uploader("測試")
-
+from google.cloud import translate_v2 as translate
 if uploaded_file is not None:
     ee=[]
     try:
@@ -422,7 +422,7 @@ text_input = st.text_input(
 if text_input:
 
     label_decoding = {0:'negative', 1:'positive'}
-    translator = Translator()
+   
     def predict_sentiment(text):
         # 自動轉義單引號
     
@@ -442,10 +442,10 @@ if text_input:
         #print('Pred Label:',label_decoding[int(pred)])             # 顯示文字 
 
     # 示例輸入
-
+    client = translate.Client()
     user_input=text_input
-    user_input = translator.translate(user_input, src='zh-CN', dest='en')
-    user_input=user_input.text
+    result  = = client.translate(text, target_language="en")
+    user_input=result["translatedText"].text
     tokenizer = get_tokenizer('basic_english')
     ans=predict_sentiment(user_input)
     if(ans=='positive'):{
