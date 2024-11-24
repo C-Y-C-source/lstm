@@ -227,7 +227,6 @@ zipp==3.19.2
 zope.interface==6.4.post2
 zstd==1.5.5.1
 numpy==1.24.3
-googletrans==4.0.0-rc1
 matplotlib==3.9.1
 Pillow==10.4.0
 pandas==2.2.2
