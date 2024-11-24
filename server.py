@@ -455,6 +455,6 @@ if text_input:
     }
     else:
         st.snow()
-    
+    st.write(user_input)
     st.write("輸入文章情緒：", ans)
 
