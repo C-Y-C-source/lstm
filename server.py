@@ -38,7 +38,7 @@ import os
 import pandas as pd
 import torch
 from collections import Counter
-
+from googletrans import Translator
 # 模型載入
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 @st.cache_resource 
@@ -420,7 +420,7 @@ text_input = st.text_input(
 )
 
 if text_input:
-    from googletrans import Translator
+
     label_decoding = {0:'negative', 1:'positive'}
     translator = Translator()
     def predict_sentiment(text):
