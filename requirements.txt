@@ -66,7 +66,6 @@ hpack==3.0.0
 hstspreload==2024.9.1
 httpcore==0.9.1
 httptools==0.6.1
-httpx==0.13.3
 huggingface-hub==0.23.2
 humanfriendly==10.0
 hyperframe==5.2.0
@@ -233,3 +232,4 @@ Pillow==10.4.0
 pandas==2.2.2
 seaborn==0.13.2
 scikit_learn==1.5.1
+httpx==0.13.3
