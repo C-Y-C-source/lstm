@@ -174,7 +174,7 @@ def load_model_2():#lstm_2
 
     model_path='mode5l.pt'
 
-    model_2.load_state_dict(torch.load(model_path))
+    model_2.load_state_dict(torch.load(model_path, map_location=device))
     model_2.eval()
     return model_2
 
