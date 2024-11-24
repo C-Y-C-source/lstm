@@ -55,7 +55,6 @@ gitdb==4.0.11
 GitPython==3.1.43
 gmpy2==2.1.2
 google-pasta==0.2.0
-googletrans==4.0.0rc1
 gradio==3.50.2
 gradio_client==0.6.1
 grpcio==1.51.3
@@ -232,4 +231,4 @@ Pillow==10.4.0
 pandas==2.2.2
 seaborn==0.13.2
 scikit_learn==1.5.1
-httpx
+googletrans-new
