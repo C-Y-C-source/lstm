@@ -35,7 +35,6 @@ from torchtext.vocab import vocab
 
 from torchtext.data.utils import get_tokenizer
 import os
-import spacy
 import pandas as pd
 import torch
 from collections import Counter
