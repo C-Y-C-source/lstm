@@ -39,7 +39,7 @@ import spacy
 import pandas as pd
 import torch
 from collections import Counter
-os.chdir(r'c:\Users\landis\Desktop\network_project') 
+
 # 模型載入
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 @st.cache_resource 
@@ -126,7 +126,7 @@ def load_and_process_data(file_path, min_freq=15):
 
 
 # 加載數據和詞彙表
-file_path = 'lstm_ana/sentimentData/IMDB Dataset.csv'
+file_path = 'IMDB_Dataset.csv'
 tokenizer, token_vocab, reviews, sentiments = load_and_process_data(file_path)
 PAD_IDX = token_vocab.get_stoi()['<pad>']
 INPUT_DIM = len(token_vocab)
@@ -173,7 +173,7 @@ def load_model_2():#lstm_2
         
     model_2 = LSTM_2(embedding_dim = 300, hidden_size= 512).to(device)
 
-    model_path=f'deploy\streamlit\mode5l.pt'
+    model_path='mode5l.pt'
 
     model_2.load_state_dict(torch.load(model_path))
     model_2.eval()
