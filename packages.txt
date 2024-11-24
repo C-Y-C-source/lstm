@@ -1,0 +1,16 @@
+build-essential 
+python3-dev  
+libpq-dev  
+ffmpeg 
+libtiff-dev  
+libjpeg-dev  
+zlib1g-dev 
+libpng-dev 
+curl 
+libssl-dev 
+python3-distutils
+libfreetype6-dev 
+libx11-dev  
+libxml2-dev 
+libxslt1-dev 
+libffi-dev 

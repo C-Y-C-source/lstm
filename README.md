@@ -1,1 +1,0 @@
-# RegionCLIP_petrained_ckpt
