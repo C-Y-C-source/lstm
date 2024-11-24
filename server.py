@@ -437,7 +437,7 @@ if text_input:
         with torch.no_grad():  # 禁用梯度計算
             output = model_2(text_tensor)  # 模型預測
             prediction = torch.sigmoid(output).item()  # 取出預測結果並應用sigmoid函數
-        pred = (output.view(-1) > 0.5)
+        pred = (output.view(-1) > 0.47)
         return label_decoding[int(pred)]
         #print('Pred Label:',label_decoding[int(pred)])             # 顯示文字 
 
