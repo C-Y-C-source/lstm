@@ -317,7 +317,7 @@ if clicked3:
 
 
 uploaded_file = st.file_uploader("測試")
-from google.cloud import translate_v2 as translate
+
 if uploaded_file is not None:
     ee=[]
     try:
@@ -418,8 +418,9 @@ text_input = st.text_input(
     disabled=False,
 
 )
+from googletrans import Translator
 if text_input:
-    from deep_translator import GoogleTranslator
+    
     label_decoding = {0:'negative', 1:'positive'}
    
     def predict_sentiment(text):
