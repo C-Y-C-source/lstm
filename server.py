@@ -418,11 +418,11 @@ text_input = st.text_input(
     disabled=False,
 
 )
-from googletrans import Translator
+from deep_translator import GoogleTranslator
 if text_input:
     
     label_decoding = {0:'negative', 1:'positive'}
-    translator = Translator()
+   
     def predict_sentiment(text):
         # 自動轉義單引號
     
@@ -445,8 +445,8 @@ if text_input:
     user_input = text_input  # 假設 text_input 是用戶輸入的文本
     
     # 使用 deep-translator 進行翻譯，從繁體中文翻譯到英文
-    user_input = translator.translate(user_input, src='zh-CN', dest='en')
-    user_input=user_input.text  # 更新為翻譯後的文本
+    translation = GoogleTranslator(source='zh-TW', target='en').translate(user_input)
+    user_input = translation  # 更新為翻譯後的文本
 
     
     tokenizer = get_tokenizer('basic_english')
@@ -456,6 +456,6 @@ if text_input:
     }
     else:
         st.snow()
-    st.write(user_input)
+    st.text_area("轉為英文：", user_input, height=200)
     st.write("輸入文章情緒：", ans)
 
