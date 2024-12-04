@@ -422,7 +422,7 @@ from googletrans import Translator
 if text_input:
     
     label_decoding = {0:'negative', 1:'positive'}
-   translator = Translator()
+    translator = Translator()
     def predict_sentiment(text):
         # 自動轉義單引號
     
