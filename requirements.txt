@@ -233,3 +233,4 @@ pandas==2.2.2
 seaborn==0.13.2
 scikit_learn==1.5.1
 deep-translator
+pyautogui
