@@ -119,11 +119,16 @@ tokenizer, token_vocab, reviews, sentiments = load_and_process_data(file_path)
 PAD_IDX = token_vocab.get_stoi()['<pad>']
 INPUT_DIM = len(token_vocab)
 
-@st.dialog("請先同意免責聲明及使用規範")
-def vote(item):
 
-    def display_vote():
-            template = f"""
+if "dialog_open" not in st.session_state:
+    st.session_state.dialog_open = True  # 初始狀態為開啟
+
+@st.dialog("請同意以下免責聲明及使用規範")
+def disclaimer_dialog():
+    """
+    顯示免責聲明的對話框
+    """
+    st.markdown("""
             ## 免責聲明
 
             1. **預測結果僅供參考**  
@@ -157,27 +162,15 @@ def vote(item):
 
             6. **責任限制**  
             在任何情況下，本網站對於任何因使用網站服務而產生的直接、間接、偶然、特殊或懲罰性損害概不負責。用戶使用本網站服務的風險由用戶自行承擔。
-            """
-            st.markdown(template)
+    """)
+    if st.button("我已閱讀並同意"):
+        st.session_state.dialog_open = False  # 標記對話框應關閉
+        st.rerun()  # 強制重新執行以移除對話框
 
-    display_vote()
-    if st.button("我已閱讀並同意以上免責聲明"):
-        pyautogui.press("esc")
-        # 如果只需執行一次，可以使用 session state 來控制
-        if 'disclaimer_accepted' not in st.session_state:
+# 主邏輯
+if st.session_state.dialog_open:
+    disclaimer_dialog()
 
-            st.session_state.disclaimer_accepted = True
-            # 模擬 ESC 鍵可能不是最佳解決方案
-            # 建議使用 Streamlit 的方法關閉對話框
-            return True
-    return False
-    
-# if st.button("我已閱讀並同意以上免責聲明"):
-#     pyautogui.press("esc")
-if 'disclaimer_accepted' not in st.session_state:
-    result = vote("A")
-    if result:
-        st.rerun() 
 
 def predict_sentiment(text):
     # 自動轉義單引號
