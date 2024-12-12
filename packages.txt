@@ -14,4 +14,3 @@ libx11-dev
 libxml2-dev 
 libxslt1-dev 
 libffi-dev 
-xvfb
