@@ -366,7 +366,7 @@ def csv_content():
     # 匯出資料
     if posts:
         df = pd.DataFrame(posts)
-        df.to_csv(r"C:\Users\mediu\Desktop\重灌輩分\network_project\deploy\streamlit\ptt_stock_filtered_content.csv", index=False, encoding="utf-8-sig")
+        df.to_csv(r"ptt_stock_filtered_content.csv", index=False, encoding="utf-8-sig")
         
 
     else:
