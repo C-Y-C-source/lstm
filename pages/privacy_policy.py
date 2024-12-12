@@ -43,8 +43,8 @@ def privacy_policy():
         本網站隱私權保護政策將因應需求隨時進行修正，修正後的條款將刊登於網站上。
     """)
 
-    if st.button("返回主页"):
-        st.switch_page("main.py")
+    if st.button("返回主頁面"):
+        st.switch_page("server.py")
 
 if __name__ == "__main__":
     privacy_policy()
