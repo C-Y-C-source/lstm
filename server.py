@@ -42,7 +42,6 @@ import pandas as pd
 import torch
 from collections import Counter
 import streamlit as st
-import pyautogui
 import joblib
 from datetime import datetime
 
