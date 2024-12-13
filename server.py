@@ -1,3 +1,4 @@
+
 # streamlit run server.py
 import streamlit as st 
 # from skimage import io
@@ -41,8 +42,9 @@ import pandas as pd
 import torch
 from collections import Counter
 import streamlit as st
-
-
+import pyautogui
+import joblib
+from datetime import datetime
 
 # 模型載入
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -85,6 +87,8 @@ def load_model_1():#lstm_1
 model_1 = load_model_1()
 one_time=0
 
+
+
 @st.cache_resource
 def load_and_process_data(file_path, min_freq=15):
     """
@@ -117,6 +121,12 @@ file_path = 'IMDB_Dataset.csv'
 tokenizer, token_vocab, reviews, sentiments = load_and_process_data(file_path)
 PAD_IDX = token_vocab.get_stoi()['<pad>']
 INPUT_DIM = len(token_vocab)
+
+
+
+
+
+
 
 
 if "dialog_open" not in st.session_state:
@@ -169,6 +179,10 @@ def disclaimer_dialog():
 # 主邏輯
 if st.session_state.dialog_open:
     disclaimer_dialog()
+
+
+
+
 
 
 def predict_sentiment(text):
@@ -238,6 +252,86 @@ def load_model_2():#lstm_2
     return model_2
 
 model_2 = load_model_2()
+
+def cnn2dm():
+    timestep = 20  # 時間步長
+    feature_size = 5  # 特徵數量
+    out_channels = [16, 32, 64]  # 卷積輸出通道
+    output_size = 1  # 輸出大小
+    class CNN2D(nn.Module):
+        def __init__(self, feature_size, timestep, out_channels, output_size):
+            super(CNN2D, self).__init__()
+
+            # 定义二维卷积层
+            self.conv2d_1 = nn.Conv2d(1, out_channels[0], kernel_size=3, padding=1)
+            self.conv2d_2 = nn.Conv2d(out_channels[0], out_channels[1], kernel_size=3, padding=1)
+            self.conv2d_3 = nn.Conv2d(out_channels[1], out_channels[2], kernel_size=3, padding=1)
+
+            # Pooling layer to reduce dimensions
+            self.pool = nn.MaxPool2d(kernel_size=2, stride=1)
+
+            # Calculate output size after convolution and pooling
+            self.conv_output_size = self.calculate_conv_output_size(timestep, feature_size)
+
+            # Define fully connected layers
+            self.fc_1 = nn.Linear(896, 256)
+            self.fc_2 = nn.Linear(256, output_size)
+
+            # Activation function
+            self.relu = nn.ReLU()
+
+        def calculate_conv_output_size(self, timestep, feature_size):
+            def calc_dim(input_size, kernel_size, stride, padding):
+                return (input_size - kernel_size + 2 * padding) // stride + 1
+
+            # First convolution layer
+            height = calc_dim(timestep, 3, 1, 1)
+            width = calc_dim(feature_size, 3, 1, 1)
+
+            # First pooling layer
+            height = calc_dim(height, 2, 2, 0)
+            width = calc_dim(width, 2, 2, 0)
+
+            # Second convolution layer
+            height = calc_dim(height, 3, 1, 1)
+            width = calc_dim(width, 3, 1, 1)
+
+            # Second pooling layer
+            height = calc_dim(height, 2, 2, 0)
+            width = calc_dim(width, 2, 2, 0)
+
+            # Third convolution layer
+            height = calc_dim(height, 3, 1, 1)
+            width = calc_dim(width, 3, 1, 1)
+
+            # Third pooling layer
+            height = calc_dim(height, 2, 2, 0)
+            width = calc_dim(width, 2, 2, 0)
+
+            return height, width
+        def forward(self, x):
+            #print(f"Input shape: {x.shape}")  # Debug
+            x = self.pool(self.relu(self.conv2d_1(x)))
+            #print(f"After conv2d_1: {x.shape}")  # Debug
+            x = self.pool(self.relu(self.conv2d_2(x)))
+            #print(f"After conv2d_2: {x.shape}")  # Debug
+            x = self.pool(self.relu(self.conv2d_3(x)))
+            #print(f"After conv2d_3: {x.shape}")  # Debug
+            x = x.view(x.size(0), -1)
+            #print(f"Flattened shape: {x.shape}")  # Debug
+            x = self.relu(self.fc_1(x))
+            x = self.fc_2(x)
+            return x
+    
+    model_3 = CNN2D(feature_size=feature_size, timestep=timestep, out_channels=out_channels, output_size=output_size)
+    model_3.load_state_dict(torch.load("2dcnn.pth"))
+    timestep = 10  # 时间步，与训练时一致
+    model_3.eval()  # 确保模型处于评估模式
+    return model_3
+
+model_dcnn = cnn2dm()
+
+    
 
 with st.sidebar:
     st.header("聯絡資訊")
@@ -399,7 +493,8 @@ def get_ptt_posts(soup, min_length):
             continue
     return result
 
-# Streamlit 介面
+# --------------------------------------------------------------------------------------
+st.write("---")
 st.title("市場情感判斷")
 
 with st.container():
@@ -421,18 +516,85 @@ if clicked1:
     with colwarning:
         st.warning(f"已刪除{deletedcontain}篇不合要求之文章")
 
-#分詞
+
+# --------------------------------------------------------------------------------------
+st.write("---")
+timestep = 10
 
 
+# 加载Scaler
+sc = joblib.load("sc.pkl")
+sc_2 = joblib.load("sc_2.pkl")
+
+ticker_all = ["2303.TW", "2330.TW", "2317.TW", "2412.TW", "3008.TW"]
+pre_all = [0, 0, 0, 0, 0]
+
+# 循环遍历所有股票
+i = 0
+end_date = datetime.today().strftime('%Y-%m-%d')
+start_date = '2024-11-28'
+
+for ticker_ever in ticker_all:
+  
+    data = yf.download(ticker_ever, start=start_date, end=end_date)
+    data.reset_index(inplace=True)
+    
+    # 使用与训练时一致的特征列
+    data_columns = ['Open', 'High', 'Low', 'Close', 'Volume']
+    data = data[data_columns].values.astype('float')
+    
+    # 归一化数据
+    data = sc.transform(data) 
+    
+
+    
+    # 创建时间步输入数据
+    def prepare_prediction_data(data, timestep):
+        input_data = []
+        for j in range(len(data) - timestep):
+            input_data.append(data[j:j + timestep])
+        return np.array(input_data)
+    
+    input_data = prepare_prediction_data(data, timestep)
+    input_tensor = torch.from_numpy(input_data).to(torch.float32)
+    
+    # 模型预测
+    with torch.no_grad():
+        predictions = model_dcnn(input_tensor.unsqueeze(1))  # 添加通道维度
+    
+    # 反归一化预测结果
+    predictions = predictions.numpy()
+    predictions_inverse = sc_2.inverse_transform(predictions)
+    
+    # 保存当前股票的预测结果
+    pre_all[i] = round(predictions_inverse[-1].item(), 2)
+    i=i+1
 
 
+with st.container():
+    coldcnn1, coldcnn2,coldcnn3,coldcnn4,coldcnn5 = st.columns(5)
+    i=0
+    for ticker_ever in ticker_all:
+        if i == 0:
+            coldcnn1.metric(label=ticker_ever, value=f"{pre_all[i]}")  # 显示结果
+        elif i == 1:
+            coldcnn2.metric(label=ticker_ever, value=f"{pre_all[i]}")
+        elif i == 2:
+            coldcnn3.metric(label=ticker_ever, value=f"{pre_all[i]}")
+        elif i == 3:
+            coldcnn4.metric(label=ticker_ever, value=f"{pre_all[i]}")
+        else:
+            coldcnn5.metric(label=ticker_ever, value=f"{pre_all[i]}")
+        
+        i += 1
 
     
 
 
 
 
-
+# --------------------------------------------------------------------------------------
+st.write("---")
 uploaded_file = st.file_uploader("測試")
 
 if uploaded_file is not None:
@@ -563,5 +725,4 @@ if text_input:
     
     st.write("輸入文章情緒：", ans)
     
-
 
