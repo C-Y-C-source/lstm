@@ -1,4 +1,3 @@
-
 # streamlit run server.py
 import streamlit as st 
 # from skimage import io
@@ -44,11 +43,10 @@ from collections import Counter
 import streamlit as st
 import joblib
 from datetime import datetime
-
+from deep_translator import GoogleTranslator
 # 模型載入
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 @st.cache_resource 
-
 def load_model_1():#lstm_1
     
     class LSTM_1(nn.Module):
@@ -71,7 +69,7 @@ def load_model_1():#lstm_1
             out = self.fc(out[:, -1, :])
             return out
         
-    input_dim = 7
+    input_dim = 5
     hidden_dim =64
     num_layers = 2
     output_dim = 1
@@ -120,12 +118,6 @@ file_path = 'IMDB_Dataset.csv'
 tokenizer, token_vocab, reviews, sentiments = load_and_process_data(file_path)
 PAD_IDX = token_vocab.get_stoi()['<pad>']
 INPUT_DIM = len(token_vocab)
-
-
-
-
-
-
 
 
 if "dialog_open" not in st.session_state:
@@ -178,12 +170,7 @@ def disclaimer_dialog():
 # 主邏輯
 if st.session_state.dialog_open:
     disclaimer_dialog()
-
-
-
-
-
-
+label_decoding = {0:'negative', 1:'positive'}
 def predict_sentiment(text):
     # 自動轉義單引號
 
@@ -392,7 +379,71 @@ if not data_today.empty and len(data_recent) >= 2:
     col33.metric("今日最低", f"{today_low:.2f}", f"{low_diff:+.2f} ({low_pct:+.2f}%)")
 else:
     st.error("無法獲取完整的數據，請稍後再試。")
+lstm_intro = """
+### 什麼是 LSTM（長短期記憶）？
 
+LSTM（Long Short-Term Memory）是一種特殊的循環神經網絡（RNN），它能夠在長時間內保持記憶，從而解決傳統 RNN 在處理長序列時的梯度消失問題。
+
+#### LSTM 的結構
+LSTM 由以下幾個主要部分組成：
+
+1. **遺忘門（Forget Gate）：**
+   - 決定哪些信息應該被丟棄，哪些應該保留。它檢查前一狀態的輸出和當前的輸入，並輸出一個 0 到 1 之間的值，表示應保留的記憶。
+
+2. **輸入門（Input Gate）：**
+   - 決定當前輸入應該對記憶進行多少修改。它包含兩個部分：一個是用來更新記憶的候選層，另一個是控制有多少候選記憶應該被加入到單元狀態中的部分。
+
+3. **單元狀態（Cell State）：**
+   - 存儲了過去的長期記憶，並根據忘記門和輸入門的結果進行更新。這是 LSTM 的關鍵部分。
+
+4. **輸出門（Output Gate）：**
+   - 根據單元狀態和當前輸入，決定輸出多少信息到下個時間步。
+
+#### LSTM 的優點
+- **解決梯度消失問題：** 相比於傳統的 RNN，LSTM 可以捕捉長期依賴，並且能夠防止梯度消失問題。
+- **時間序列預測：** LSTM 特別適合處理時間序列數據，比如語音識別、語言建模等。
+
+#### LSTM 的應用領域
+- **語音識別：** 用於將語音信號轉換為文字。
+- **語言處理：** 用於機器翻譯和情感分析等任務。
+- **金融預測：** 用於股票價格預測、銷售預測等。
+
+LSTM 是處理時間序列數據的強大工具，能夠記住關鍵的時間步信息，並忽略不必要的噪聲。
+"""
+cnn_intro = """
+### 什麼是 2D CNN（卷積神經網絡）？
+
+2D 卷積神經網絡（2D CNN）是一種深度學習模型，主要用於處理2D數據（如圖像）。它通過卷積操作學習圖像中的空間特徵，並通過多層堆疊來提取從低層到高層的特徵。
+
+#### 2D CNN 的結構
+1. **卷積層（Convolutional Layer）：**
+   - 使用濾波器（或稱為卷積核）來掃描圖像，提取圖像的局部特徵（如邊緣、角落等）。這一層通過卷積運算生成特徵圖（feature map）。
+
+2. **池化層（Pooling Layer）：**
+   - 用於縮小圖像的空間尺寸，從而減少計算量並防止過擬合。最常見的是最大池化（Max Pooling）和平均池化（Average Pooling）。
+
+3. **激活函數（Activation Function）：**
+   - 通常使用 ReLU（Rectified Linear Unit）激活函數，來增加非線性，使神經網絡能夠學習更加複雜的模式。
+
+4. **全連接層（Fully Connected Layer）：**
+   - 在卷積層和池化層之後，將學到的特徵進行分類或回歸任務。
+
+5. **輸出層（Output Layer）：**
+   - 根據任務的需求，輸出不同的結果，分類任務通常使用 softmax 函數進行多分類，回歸任務則直接輸出連續值。
+
+#### 2D CNN 的優點
+- **空間不變性：** CNN 能夠學習圖像中的局部特徵，並對圖像進行平移、旋轉等變換的判斷。
+- **參數共享：** 卷積層中的濾波器是共享的，這意味著每個濾波器在整個圖像中都是相同的，這大大減少了參數數量。
+- **層次特徵學習：** 通過多層卷積和池化操作，CNN 能夠從低層到高層逐步學習圖像中的複雜特徵。
+
+#### 2D CNN 的應用領域
+- **圖像分類：** 用於對不同類別的圖像進行分類（例如，辨識貓狗圖像）。
+- **物體檢測：** 用於識別圖像中的特定物體位置。
+- **面部識別：** 用於檢測圖像中的人臉並進行識別。
+- **醫學影像分析：** 用於分析醫學影像（如 X 光片、CT 扫描等）進行疾病診斷。
+
+2D CNN 在圖像處理領域取得了顯著的成功，並成為許多視覺識別任務的基礎。
+"""
 
 
 import streamlit as st
@@ -404,7 +455,6 @@ from bs4 import BeautifulSoup
 import streamlit as st
 
 def csv_content():
-    """爬取 PTT 股票板最近 60 篇有效文章並儲存為 CSV"""
     base_url = "https://www.ptt.cc/bbs/Stock/index.html"
     posts = []
     min_length = 50  # 最小內文長度限制
@@ -446,7 +496,7 @@ def csv_content():
             st.error(f"無法取得網頁內容，HTTP 狀態碼：{response.status_code}")
             break
 
-        time.sleep(1)  # 避免過於頻繁的請求
+        time.sleep(0.5)  # 避免過於頻繁的請求
 
     # 匯出資料
     if posts:
@@ -466,7 +516,8 @@ def get_ptt_posts(soup, min_length):
         try:
             # 抓取文章標題
             title = item.select_one("div.title").text.strip()
-            
+            if "[公告]" in title:
+                continue
             # 抓取文章連結
             link_tag = item.select_one("div.title a")
             if link_tag:
@@ -492,10 +543,104 @@ def get_ptt_posts(soup, min_length):
             continue
     return result
 
+def sen_ana(sentiment_counts):
+    file_path=r'ptt_stock_filtered_content.csv'
+    data = pd.read_csv(file_path)
+    
+    results = []
+    progress_bar = st.progress(0)
+    status_text = st.empty()
+    total_items = len(data['content'])
+    for index, content in enumerate(data['content']):
+        if isinstance(content, str):
+
+            content = content.replace("\r\n", " ").replace("\n", " ").replace("　", " " ).replace("-", " ").strip()
+            content = ' '.join(content.split())
+            content = re.sub(r'[^\w\s]', '', content)
+            content = content.lower()
+            content = content.encode('utf-8', errors='ignore').decode('utf-8')
+            #
+            translation = GoogleTranslator(source='zh-TW', target='en').translate(content)
+
+            sentiment_code = predict_sentiment(translation)
+            
+
+            
+            sentiment_label = "positive" if sentiment_code == "positive" else "negative"
+
+            sentiment_counts[sentiment_label] += 1
+            
+            progress_bar.progress((index + 1) / total_items)
+            status_text.text(f"已完成數量：{index + 1}/{60}")
+
+            results.append({"Original": content, "Translated": translation, "Sentiment": sentiment_label})
+            
+    return results
+
+def display_bar_chart(sentiment_counts):
+    # 配置直方圖選項
+    option = {
+        "backgroundColor": "#212121",
+        "title": {
+            "text": "情感分析統計",
+            "subtext": "資料來源PTT-STOCK",
+            "x": "left",
+            "textStyle": {
+                "color": "#f2f2f2"
+            }
+        },
+        "tooltip": {
+            "trigger": "axis",
+            "axisPointer": {
+                "type": "shadow"
+            }
+        },
+        "legend": {
+            "data": ["COUNT"],
+            "textStyle": {
+                "color": "#f2f2f2"
+            }
+        },
+        "xAxis": {
+            "type": "category",
+            "data": ["positive","negative"],
+            "axisLine": {
+                "lineStyle": {
+                    "color": "#f2f2f2"
+                }
+            },
+            "axisLabel": {
+ 
+                "interval": 0 
+            }
+        },
+        "yAxis": {
+            "type": "value",
+            "axisLine": {
+                "lineStyle": {
+                    "color": "#f2f2f2"
+                }
+            }
+        },
+        "series": [
+            {
+                "name": "COUNT",
+                "type": "bar",
+                "data": [sentiment_counts['positive'],sentiment_counts['negative']],
+                "itemStyle": {
+                    "color": "#ef4136"
+                }
+            }
+        ]
+    }
+
+    st_echarts(options=option, height="600px")
+ 
+
 # --------------------------------------------------------------------------------------
 st.write("---")
 st.title("市場情感判斷")
-
+sentiment_counts = {"positive": 0, "negative": 0}
 with st.container():
     col1, col2 = st.columns(2)
 
@@ -507,7 +652,11 @@ with st.container():
     with col2:
         clicked2 = st.button("更新情感統計", help="更新最近 60 篇有效文章情感統計")
         if clicked2:
-            len_post,deletedcontain=csv_content()
+            
+            results=sen_ana(sentiment_counts)
+
+                        #len_post,deletedcontain=csv_content()
+    
 colsuccess, colwarning = st.columns(2)
 if clicked1:
     with colsuccess:
@@ -515,9 +664,83 @@ if clicked1:
     with colwarning:
         st.warning(f"已刪除{deletedcontain}篇不合要求之文章")
 
+if clicked2:
+    sentiment_df = pd.DataFrame(results)
+    st.write("### Sentiment Counts:", sentiment_counts)
+    positive_count = sentiment_counts['positive']
+    negative_count = sentiment_counts['negative']
+    display_bar_chart(sentiment_counts)
+    sentiment_df = pd.DataFrame(results)
+    st.markdown("### Results Table")
+    st.write(sentiment_df)
+# 雙向 LSTM 介紹
+with st.expander("雙向 LSTM (BiLSTM) 介紹"):
+    st.markdown("""
+    ## 雙向 LSTM (BiLSTM) 介紹
+
+    雙向 LSTM（Bidirectional Long Short-Term Memory）是一種特別的 LSTM 模型，它在處理序列數據時，將輸入序列同時從兩個方向進行處理——正向和反向。這使得模型能夠利用更多上下文信息，從而提高預測性能。
+
+    ### BiLSTM 的結構
+
+    與傳統的 LSTM 模型相比，BiLSTM 擁有兩層 LSTM 組件：
+    1. **正向 LSTM**：從序列的開始處到結束，順序地處理數據。
+    2. **反向 LSTM**：從序列的結束處回到開始，逆向處理數據。
+
+    這兩層 LSTM 的輸出會被結合（通常是串接或加權平均），形成最終的輸出。這樣做的目的是讓模型能夠同時考慮序列的過去和未來信息。
+
+    ### BiLSTM 的應用
+
+    BiLSTM 主要應用於需要上下文信息的序列處理任務：
+    - **語言模型**：語言理解、情感分析。
+    - **語音識別**：可以考慮語音的上下文。
+    - **機器翻譯**：處理源語言和目標語言的上下文信息。
+
+    ### 優點
+    - 能夠捕捉更多的上下文信息（雙向的前後關係）。
+    - 增加了模型的表達能力，適用於更復雜的序列數據。
+
+    ### 缺點
+    - 計算量和內存需求較高，因為模型需要處理兩個方向的序列。
+    """)
+
+# 注意力機制介紹
+with st.expander("注意力機制 (Attention Mechanism) 介紹"):
+    st.markdown("""
+    ## 注意力機制 (Attention Mechanism) 介紹
+
+    注意力機制是一種模仿人類視覺注意力的算法，用來使模型能夠專注於序列中的關鍵部分。它在處理長序列時尤其有用，因為它可以幫助模型“選擇性地”關注序列中的重要位置，而非對整個序列進行平等的處理。
+
+    ### 注意力機制的工作原理
+
+    注意力機制會根據某個輸入的“查詢”來計算每個元素的權重，這些權重決定了模型應該將多少注意力集中在該元素上。通常，這些權重是通過計算查詢與所有鍵的相似度來獲得的。
+
+    - **查詢 (Query)**：用來查找序列中相關信息的向量。
+    - **鍵 (Key)**：序列中的每個元素，模型用它來決定是否需要關注該元素。
+    - **值 (Value)**：對應於鍵的輸出，經過加權後被選擇性地用於最終輸出。
+
+    在計算過程中，通過內積或其他相似度測量來計算查詢和鍵之間的相似度，然後根據相似度為值分配權重。
+
+    ### 注意力機制的應用
+
+    - **機器翻譯**：注意力機制可以讓模型在生成翻譯時專注於源語言的關鍵部分。
+    - **圖像描述生成**：在生成描述時，模型可以專注於圖像中的重要區域。
+    - **語音識別**：在語音轉文字的過程中，模型可以選擇性地專注於特定的時間步。
+
+    ### 優點
+    - 能夠處理長序列數據，克服了傳統 RNN 和 LSTM 在長距離依賴處理上的局限性。
+    - 增強了模型的可解釋性，可以清楚地看到模型關注的關鍵部分。
+
+    ### 缺點
+    - 計算開銷較大，尤其是在長序列的情況下。
+    - 需要更多的計算資源，尤其是在多層注意力結構中。
+    """)
 
 # --------------------------------------------------------------------------------------
+
 st.write("---")
+st.markdown("# 算法股價建議價格")
+st.markdown("### 深度捲機網路(DCNN)")
+
 timestep = 10
 
 
@@ -525,29 +748,26 @@ timestep = 10
 sc = joblib.load("sc.pkl")
 sc_2 = joblib.load("sc_2.pkl")
 
-ticker_all = ["2303.TW", "2330.TW", "2317.TW", "2412.TW", "3008.TW"]
-pre_all = [0, 0, 0, 0, 0]
+ticker_all = ["2303.TW", "2330.TW", "2317.TW", "2412.TW"]
+pre_all = [0] * len(ticker_all)
+compare_dcnn_data = [0] * len(ticker_all)
+open_diff = [0] * len(ticker_all)
+open_pct = [0] * len(ticker_all)
 
-# 循环遍历所有股票
-i = 0
 end_date = datetime.today().strftime('%Y-%m-%d')
 start_date = '2024-11-28'
 
-for ticker_ever in ticker_all:
-  
+for i, ticker_ever in enumerate(ticker_all):
     data = yf.download(ticker_ever, start=start_date, end=end_date)
     data.reset_index(inplace=True)
-    
-    # 使用与训练时一致的特征列
+
     data_columns = ['Open', 'High', 'Low', 'Close', 'Volume']
     data = data[data_columns].values.astype('float')
-    
-    # 归一化数据
-    data = sc.transform(data) 
-    
 
-    
-    # 创建时间步输入数据
+    compare_dcnn_data[i] = data[-1, 0]
+
+    data = sc.transform(data)
+
     def prepare_prediction_data(data, timestep):
         input_data = []
         for j in range(len(data) - timestep):
@@ -556,172 +776,81 @@ for ticker_ever in ticker_all:
     
     input_data = prepare_prediction_data(data, timestep)
     input_tensor = torch.from_numpy(input_data).to(torch.float32)
-    
-    # 模型预测
+
     with torch.no_grad():
         predictions = model_dcnn(input_tensor.unsqueeze(1))  # 添加通道维度
-    
-    # 反归一化预测结果
     predictions = predictions.numpy()
     predictions_inverse = sc_2.inverse_transform(predictions)
     
-    # 保存当前股票的预测结果
-    pre_all[i] = round(predictions_inverse[-1].item(), 2)
-    i=i+1
+
+    pre_all[i] = round(predictions_inverse[-1].item(), 1)
+    open_diff[i] = pre_all[i]-compare_dcnn_data[i]
+    open_pct[i] = (open_diff[i] / compare_dcnn_data[i]) * 100
+
+with st.container():
+    columns = st.columns(len(ticker_all))
+    
+    for i, ticker_ever in enumerate(ticker_all):
+        columns[i].metric(
+            label=ticker_ever,
+            value=f"{pre_all[i]}",
+            delta=f"{open_diff[i]:+.2f} ({open_pct[i]:+.2f}%)"
+        )
+with st.expander("點擊查看 2D CNN 介紹"):
+    st.markdown(cnn_intro)       
+# -------------------------------
+st.markdown("### 長短效神經網路(LSTM)")    
+def transform_data(df):
+    data_index =  ['Open','High','Low','Close','Volume']
+    flatten_data = df[data_index].values.reshape(-1)  # 攤平資料
+    str_data = "<SEP>".join(flatten_data.astype('str'))
+    filter_data = str_data.replace(',',"").replace('X',"")
+    x_data = filter_data.split("<SEP>")
+    return x_data
+
+
+for i, ticker_ever in enumerate(ticker_all):
+    data = yf.download(ticker_ever, start=start_date, end=end_date)
+    data.reset_index(inplace=True)
+
+    data_columns = ['Open', 'High', 'Low', 'Close', 'Volume']
+    data = data[data_columns].values.astype('float')
+
+    compare_dcnn_data[i] = data[-1, 0]
+
+    data = sc.transform(data)
+
+    def prepare_prediction_data(data, timestep):
+        input_data = []
+        for j in range(len(data) - timestep):
+            input_data.append(data[j:j + timestep])
+        return np.array(input_data)
+    
+    input_data = prepare_prediction_data(data, timestep)
+    input_tensor = torch.from_numpy(input_data).to(torch.float32)
+
+    with torch.no_grad():
+        predictions = model_1(input_tensor)  
+    predictions = predictions.numpy()
+    predictions_inverse = sc_2.inverse_transform(predictions)
+    
+
+    pre_all[i] = round(predictions_inverse[-1].item(), 1)
+    open_diff[i] = pre_all[i]-compare_dcnn_data[i]
+    open_pct[i] = (open_diff[i] / compare_dcnn_data[i]) * 100
 
 
 with st.container():
-    coldcnn1, coldcnn2,coldcnn3,coldcnn4,coldcnn5 = st.columns(5)
-    i=0
-    for ticker_ever in ticker_all:
-        if i == 0:
-            coldcnn1.metric(label=ticker_ever, value=f"{pre_all[i]}")  # 显示结果
-        elif i == 1:
-            coldcnn2.metric(label=ticker_ever, value=f"{pre_all[i]}")
-        elif i == 2:
-            coldcnn3.metric(label=ticker_ever, value=f"{pre_all[i]}")
-        elif i == 3:
-            coldcnn4.metric(label=ticker_ever, value=f"{pre_all[i]}")
-        else:
-            coldcnn5.metric(label=ticker_ever, value=f"{pre_all[i]}")
-        
-        i += 1
-
+    columns1 = st.columns(len(ticker_all))
     
+    for i, ticker_ever in enumerate(ticker_all):
+        columns1[i].metric(
+            label=ticker_ever,
+            value=f"{pre_all[i]}",
+            delta=f"{open_diff[i]:+.2f} ({open_pct[i]:+.2f}%)"
+        )
 
-
-
-
+with st.expander("點擊查看 LSTM 介紹"):
+    st.markdown(lstm_intro)
 # --------------------------------------------------------------------------------------
 st.write("---")
-uploaded_file = st.file_uploader("測試")
-
-if uploaded_file is not None:
-    ee=[]
-    try:
-        def transform_data(df):
-
-            data_index =  ['Close','Volume2','h-l','sma','10ema','greed','adr']
-        
-            flatten_data = df[data_index].values.reshape(-1)  # 攤平資料
-            
-            # 轉換成字串
-            str_data = "<SEP>".join(flatten_data.astype('str'))
-            filter_data = str_data.replace(',',"").replace('X',"")
-            
-            # 切割回陣列
-            x_data = filter_data.split("<SEP>")
-            
-            return x_data
-            
-        x = []
-        df = pd.read_csv(uploaded_file)
-        df2=df['Close']
-        data = transform_data(df)
-
-        data_index=['Close']
-        data2 = df[data_index].values.reshape(-1)  # 攤平資料
-        ee.extend(data2)
-
-        x.extend(data)
-        sc = MinMaxScaler()
-        sc_2 = MinMaxScaler()
-
-
-        x = np.array(x).astype('float')
-        x = x.reshape(-1, len(['Close','Volume2','h-l','sma','10ema','greed','adr']))
-
-        ee = np.array(ee).astype('float')
-        ee = ee.reshape(-1, 1)
-        ee=sc_2.fit_transform(ee)
-
-        x = sc.fit_transform(x)
-        y = x[:,0]
-
-
-        def split_data(datas, labels, split_num = 10):
-            max_len = len(datas)
-            x, y = [], []
-            for i in range(max_len - split_num -1):
-                x.append(datas[i: i+split_num])
-                y.append(labels[split_num+i+1])
-            
-            return np.array(x), np.array(y)
-
-
-        x_train, x_valid, y_train, y_valid = train_test_split(x, y, train_size=1, shuffle=False)
-
-        x_valid, y_valid = split_data(x_valid, y_valid)
-
-        x_valid=torch.from_numpy(x_valid).type(torch.Tensor)
-        y_valid=torch.from_numpy(y_valid).float().unsqueeze(1)
-        x_valid = x_valid
-        y_valid=y_valid
-
-        with torch.no_grad():
-            x_valid = x_valid.to(device)  # Move x_valid to the same device as the model
-            y_pred = model_1(x_valid)
-        y_pred = y_pred.cpu().numpy()
-        y_valid = y_valid.cpu().numpy()
-        y_pred_inverse = sc_2.inverse_transform(y_pred)
-        y_valid_inverse = sc_2.inverse_transform(y_valid)
-        # print(y_pred_inverse.item())#預測
-        # print(y_valid_inverse.item())#原始
-        
-
-        def display_predictions(y_pred_inverse, y_valid_inverse):
-            template = f"""
-            ### 預測結果預測:{round(y_pred_inverse.item(),1)}
-
-            
-
-            ### 預測結果原始:{y_valid_inverse.item()}
-            
-            """
-            st.markdown(template)
-            st.toast('上傳成功!!', icon='🎉')
-
-        display_predictions(y_pred_inverse, y_valid_inverse)
-    except Exception as e:
-         st.error(f"文件處理過程中發生錯誤請確認上傳文件格式")
-    
-# Store the initial value of widgets in session state
-if "visibility" not in st.session_state:
-    st.session_state.visibility = "visible"
-    st.session_state.disabled = False
-
-
-text_input = st.text_input(
-    "Enter some text 👇",
-    placeholder="輸入文章",
-    label_visibility="visible",
-    disabled=False,
-
-)
-
-
-
-if text_input:
-    from deep_translator import GoogleTranslator
-    label_decoding = {0:'negative', 1:'positive'}
-   
-
-    user_input = text_input  # 假設 text_input 是用戶輸入的文本
-    
-    # 使用 deep-translator 進行翻譯，從繁體中文翻譯到英文
-    translation = GoogleTranslator(source='zh-TW', target='en').translate(user_input)
-    user_input = translation  # 更新為翻譯後的文本
-
-    
-    tokenizer = get_tokenizer('basic_english')
-    ans=predict_sentiment(user_input)
-    if(ans=='positive'):{
-        st.balloons()
-    }
-    else:
-        st.snow()
-    st.text_area("轉為英文：", user_input, height=200)
-    
-    st.write("輸入文章情緒：", ans)
-    
-
