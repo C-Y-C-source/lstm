@@ -44,6 +44,7 @@ import streamlit as st
 import joblib
 from datetime import datetime
 from deep_translator import GoogleTranslator
+
 # 模型載入
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 @st.cache_resource 
@@ -654,7 +655,10 @@ with st.container():
         if clicked2:
             
             results=sen_ana(sentiment_counts)
-
+            if sentiment_counts['positive']>sentiment_counts['negative']:
+                st.balloons()
+            else:
+                st.snow()
                         #len_post,deletedcontain=csv_content()
     
 colsuccess, colwarning = st.columns(2)
@@ -854,3 +858,82 @@ with st.expander("點擊查看 LSTM 介紹"):
     st.markdown(lstm_intro)
 # --------------------------------------------------------------------------------------
 st.write("---")
+
+import google.generativeai as genai
+import streamlit as st
+
+# 設置標題
+st.title("有問題嗎?問問Gemini")
+with st.expander("如何申請 Gemini API 密鑰"):
+    st.write("""
+        要在你的應用程式中使用 Gemini API，你需要一個 API 密鑰。請依照以下步驟申請密鑰：
+
+        1. **註冊 Google Cloud 帳號：**
+           - 造訪 [Google Cloud 官方網站](https://cloud.google.com/)，並註冊一個帳號。如果你已經有帳號，請直接登入。
+
+        2. **啟用 Gemini API：**
+           - 登入後，前往 [API 服務頁面](https://console.cloud.google.com/).
+           - 搜尋 **"Gemini"** 並啟用 Gemini API。
+           - 點擊 **"啟用"** 來開通該服務。
+
+        3. **取得 API 密鑰：**
+           - 在 API 設定頁面，進入 **Credentials**（認證）選項。
+           - 點擊 **"Create Credentials"**（創建認證），選擇 **API key**。
+           - 系統將生成一個 API 密鑰，記得複製並妥善保存。
+
+        4. **將 API 密鑰添加到你的應用程式中：**
+           - 現在你可以將這個 API 密鑰貼入到你的應用程式中，例如在你的 Streamlit 應用中。
+           - 確保密鑰以 **"AIza"** 開頭（例如："AXXXXXXXXXXXXXXX--6XXXXXXXXXXXXXXXXXX"）。
+
+        5. **安全性注意事項：**
+           - 請保管好你的 API 密鑰，避免公開分享或暴露在客戶端程式碼中。
+           - 建議使用環境變數或密鑰管理工具來提升安全性。
+
+        取得 API 密鑰後，你就可以將其整合到你的應用程式中，使用 Gemini API 提供的功能來生成內容。
+    """)
+# Add custom CSS to adjust the position of the chat input box
+st.markdown(
+    """
+    <style>
+    .stTextInput > div {
+        margin-bottom: 400px;  /* Adjust this value to move the input box up */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+api_key = st.secrets["openai"]["api_key"]
+genai.configure(api_key=api_key)
+
+model_name = "gemini-1.5-flash"
+model = genai.GenerativeModel(model_name)
+
+# 初始化 session_state
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+# 顯示歷史消息
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+# 處理用戶輸入
+if prompt := st.chat_input("LSTM是甚麼?"):
+    # 儲存用戶消息
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
+
+    # 生成回覆
+    with st.chat_message("assistant"):
+        try:
+            response = model.generate_content(prompt)
+            reply = response.text
+            st.markdown(reply)
+        except Exception as e:
+            reply = f"Error: {e}"
+            st.markdown(reply)
+
+    # 儲存助理消息
+    st.session_state.messages.append({"role": "assistant", "content": reply})
