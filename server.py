@@ -744,7 +744,7 @@ with st.expander("注意力機制 (Attention Mechanism) 介紹"):
 
 st.write("---")
 st.markdown("# 算法股價建議價格")
-st.markdown("### 深度捲機網路(DCNN)")
+st.markdown("### 深度捲機網路(2DCNN)")
 
 timestep = 10
 
@@ -866,6 +866,8 @@ import streamlit as st
 # 設置標題
 st.title("有問題嗎?問問Gemini")
 st.caption("🚀power by gemini-1.5-flash")
+
+
 with st.expander("如何申請 Gemini API 密鑰"):
     st.write("""
         要在你的應用程式中使用 Gemini API，你需要一個 API 密鑰。請依照以下步驟申請密鑰：
