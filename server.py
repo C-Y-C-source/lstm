@@ -316,7 +316,9 @@ def cnn2dm():
     return model_3
 
 model_dcnn = cnn2dm()
-
+# 主邏輯
+if st.session_state.dialog_open:
+    disclaimer_dialog()
     
 
 with st.sidebar:
@@ -576,9 +578,7 @@ def sen_ana(sentiment_counts):
             results.append({"Original": content, "Translated": translation, "Sentiment": sentiment_label})
             
     return results
-# 主邏輯
-if st.session_state.dialog_open:
-    disclaimer_dialog()
+
 def display_bar_chart(sentiment_counts):
     # 配置直方圖選項
     option = {
