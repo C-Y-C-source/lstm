@@ -903,7 +903,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-api_key = st.secrets["openai"]["api_key"]
+api_key ="AIzaSyDFs5XZgXglC--6ove5VsnV3l4CH44BZ70"
 genai.configure(api_key=api_key)
 
 model_name = "gemini-1.5-flash"
