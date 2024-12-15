@@ -45,6 +45,57 @@ import joblib
 from datetime import datetime
 from deep_translator import GoogleTranslator
 
+if "dialog_open" not in st.session_state:
+    st.session_state.dialog_open = True  # 初始狀態為開啟
+
+@st.dialog("請同意以下免責聲明及使用規範")
+def disclaimer_dialog():
+    """
+    顯示免責聲明的對話框
+    """
+    st.markdown("""
+            ## 免責聲明
+
+            1. **預測結果僅供參考**  
+            本網站提供的所有股票預測結果、數據分析及建議均僅供參考。預測結果基於歷史數據及AI模型分析，但無法保證其準確性或未來表現。使用者應自行判斷其決策並承擔風險。
+
+            2. **不作為投資建議**  
+            本網站所提供的資訊、預測及分析內容不應視為任何形式的投資建議。用戶在做出投資決策前，應諮詢專業投資顧問，並充分了解所有風險。
+
+            3. **風險提示**  
+            股票市場波動性大，投資涉及風險。過去的表現不代表未來結果，所有的投資決策和行為均由用戶自行承擔風險。網站不對任何因使用本網站資訊而產生的損失或損害負責。
+
+            4. **數據準確性**  
+            本網站提供的資料來自第三方數據源。雖然我們已竭盡全力確保資料的準確性與時效性，但無法保證所有資料無誤或無延遲。本網站對於因數據不準確或延遲造成的任何損失不承擔責任。
+            
+            ## 使用規範
+
+            1. **使用者責任**  
+            用戶在使用本網站服務時，應保證提供的所有資訊真實、準確且合法。用戶不得利用本網站進行任何非法活動，包括但不限於欺詐、操縱市場或違反相關法律法規。
+
+            2. **禁止商業用途**  
+            本網站僅供個人使用，不得用於任何商業用途。用戶不得將網站的內容或數據進行轉售、複製、修改或重新發布。
+
+            3. **版權聲明**  
+            本網站所有內容（包括但不限於文本、圖像、數據及預測結果）均受版權保護。未經網站明確授權，任何人不得以任何形式使用、重製或分發本網站的內容。
+
+            4. **隱私政策**  
+            我們重視用戶隱私，並承諾按照隱私政策保護用戶的個人資訊。詳細隱私政策請參見網站的隱私政策頁面。
+
+            5. **服務中斷與修改**  
+            本網站保留隨時中斷、修改或更新服務內容的權利，且不需事先通知。對於由於服務中斷或修改所導致的任何損失，我們不承擔責任。
+
+            6. **責任限制**  
+            在任何情況下，本網站對於任何因使用網站服務而產生的直接、間接、偶然、特殊或懲罰性損害概不負責。用戶使用本網站服務的風險由用戶自行承擔。
+    """)
+    if st.button("我已閱讀並同意"):
+        st.session_state.dialog_open = False  # 標記對話框應關閉
+        st.rerun()  # 強制重新執行以移除對話框
+
+# 主邏輯
+if st.session_state.dialog_open:
+    disclaimer_dialog()
+    
 # 模型載入
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 @st.cache_resource 
@@ -121,56 +172,6 @@ PAD_IDX = token_vocab.get_stoi()['<pad>']
 INPUT_DIM = len(token_vocab)
 
 
-if "dialog_open" not in st.session_state:
-    st.session_state.dialog_open = True  # 初始狀態為開啟
-
-@st.dialog("請同意以下免責聲明及使用規範")
-def disclaimer_dialog():
-    """
-    顯示免責聲明的對話框
-    """
-    st.markdown("""
-            ## 免責聲明
-
-            1. **預測結果僅供參考**  
-            本網站提供的所有股票預測結果、數據分析及建議均僅供參考。預測結果基於歷史數據及AI模型分析，但無法保證其準確性或未來表現。使用者應自行判斷其決策並承擔風險。
-
-            2. **不作為投資建議**  
-            本網站所提供的資訊、預測及分析內容不應視為任何形式的投資建議。用戶在做出投資決策前，應諮詢專業投資顧問，並充分了解所有風險。
-
-            3. **風險提示**  
-            股票市場波動性大，投資涉及風險。過去的表現不代表未來結果，所有的投資決策和行為均由用戶自行承擔風險。網站不對任何因使用本網站資訊而產生的損失或損害負責。
-
-            4. **數據準確性**  
-            本網站提供的資料來自第三方數據源。雖然我們已竭盡全力確保資料的準確性與時效性，但無法保證所有資料無誤或無延遲。本網站對於因數據不準確或延遲造成的任何損失不承擔責任。
-            
-            ## 使用規範
-
-            1. **使用者責任**  
-            用戶在使用本網站服務時，應保證提供的所有資訊真實、準確且合法。用戶不得利用本網站進行任何非法活動，包括但不限於欺詐、操縱市場或違反相關法律法規。
-
-            2. **禁止商業用途**  
-            本網站僅供個人使用，不得用於任何商業用途。用戶不得將網站的內容或數據進行轉售、複製、修改或重新發布。
-
-            3. **版權聲明**  
-            本網站所有內容（包括但不限於文本、圖像、數據及預測結果）均受版權保護。未經網站明確授權，任何人不得以任何形式使用、重製或分發本網站的內容。
-
-            4. **隱私政策**  
-            我們重視用戶隱私，並承諾按照隱私政策保護用戶的個人資訊。詳細隱私政策請參見網站的隱私政策頁面。
-
-            5. **服務中斷與修改**  
-            本網站保留隨時中斷、修改或更新服務內容的權利，且不需事先通知。對於由於服務中斷或修改所導致的任何損失，我們不承擔責任。
-
-            6. **責任限制**  
-            在任何情況下，本網站對於任何因使用網站服務而產生的直接、間接、偶然、特殊或懲罰性損害概不負責。用戶使用本網站服務的風險由用戶自行承擔。
-    """)
-    if st.button("我已閱讀並同意"):
-        st.session_state.dialog_open = False  # 標記對話框應關閉
-        st.rerun()  # 強制重新執行以移除對話框
-
-# 主邏輯
-if st.session_state.dialog_open:
-    disclaimer_dialog()
 label_decoding = {0:'negative', 1:'positive'}
 def predict_sentiment(text):
     # 自動轉義單引號
@@ -537,7 +538,7 @@ def get_ptt_posts(soup, min_length):
                 content = "無法取得內容"
             
             # 如果內文長度小於指定最小字數，則跳過
-            if len(content) >= min_length:
+            if len(content) >= min_length and  len(content)<4999:
                 result.append({"title": title, "content": content})
         except Exception as e:
             print(f"發生錯誤：{e}")
@@ -903,7 +904,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-api_key ="AIzaSyDFs5XZgXglC--6ove5VsnV3l4CH44BZ70"
+api_key = "AIzaSyDFs5XZgXglC--6ove5VsnV3l4CH44BZ70"
 genai.configure(api_key=api_key)
 
 model_name = "gemini-1.5-flash"
@@ -918,14 +919,12 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# 處理用戶輸入
-if prompt := st.chat_input("LSTM是甚麼?"):
-    # 儲存用戶消息
+if prompt := st.chat_input("LSTM是甚麼? 問問Gemini"):
+
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    # 生成回覆
     with st.chat_message("assistant"):
         try:
             response = model.generate_content(prompt)
@@ -935,5 +934,10 @@ if prompt := st.chat_input("LSTM是甚麼?"):
             reply = f"Error: {e}"
             st.markdown(reply)
 
-    # 儲存助理消息
     st.session_state.messages.append({"role": "assistant", "content": reply})
+
+
+
+
+
+
