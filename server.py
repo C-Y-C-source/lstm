@@ -92,9 +92,7 @@ def disclaimer_dialog():
         st.session_state.dialog_open = False  # 標記對話框應關閉
         st.rerun()  # 強制重新執行以移除對話框
 
-# 主邏輯
-if st.session_state.dialog_open:
-    disclaimer_dialog()
+
     
 # 模型載入
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -578,7 +576,9 @@ def sen_ana(sentiment_counts):
             results.append({"Original": content, "Translated": translation, "Sentiment": sentiment_label})
             
     return results
-
+# 主邏輯
+if st.session_state.dialog_open:
+    disclaimer_dialog()
 def display_bar_chart(sentiment_counts):
     # 配置直方圖選項
     option = {
