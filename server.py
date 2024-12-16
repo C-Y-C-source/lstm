@@ -907,7 +907,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-api_key = "AIzaSyDFs5XZgXglC--6ove5VsnV3l4CH44BZ70"
+api_key = "AIzaSyCLvUf1gLc54ZF1aBttEz1AjAHi1Gddtv8"
 genai.configure(api_key=api_key)
 
 model_name = "gemini-1.5-flash"
