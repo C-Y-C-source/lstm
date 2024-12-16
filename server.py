@@ -641,6 +641,169 @@ def display_bar_chart(sentiment_counts):
 
 # --------------------------------------------------------------------------------------
 st.write("---")
+def load_and_process_data(file_path):
+    # 定義熱門股票代碼與公司名稱（這部分保持不變）
+    popular_stocks = {
+        "2618": "長榮航",
+        "2883": "凱基金",
+        "9105": "泰金寶-DR",
+        "2303": "聯電",
+        "3706": "神達",
+        "3481": "群創",
+        "3019": "亞光",
+        "00919": "群益台灣精選高息",
+        "2888": "新光金",
+        "2887": "台新金",
+        "2354": "鴻準",
+        "2317": "鴻海",
+        "6770": "力積電",
+        "2353": "宏碁",
+        "3029": "零壹",
+        "2313": "華通",
+        "2609": "陽明",
+        "00965": "元大航太防衛科技",
+        "2344": "華邦電",
+        "3037": "欣興",
+        "4540": "全球傳動",
+        "2002": "中鋼",
+        "2368": "金像電",
+        "2890": "永豐金",
+        "2312": "金寶",
+        "2886": "兆豐金",
+        "2308": "台達電",
+        "00637L": "元大滬深300正2",
+        "00939": "統一台灣高息動能",
+        "1605": "華新",
+        "5876": "上海商銀",
+        "2409": "友達",
+        "00934": "中信成長高股息",
+        "3231": "緯創",
+        "3450": "聯鈞",
+        "00945B": "凱基美國非投等債",
+        "2383": "台光電",
+        "2891": "中信金",
+        "2880": "華南金",
+        "00918": "大華優利高填息30",
+        "2892": "第一金",
+        "4906": "正文",
+        "2359": "所羅門",
+        "2356": "英業達",
+        "2392": "正崴",
+        "2027": "大成鋼",
+        "2603": "長榮",
+        "1314": "中石化",
+        "2399": "映泰",
+        "00665L": "富邦恒生國企正2",
+        "1101": "台泥",
+        "2884": "玉山金",
+        "1326": "台化",
+        "2606": "裕民",
+        "8070": "長華",
+        "1402": "遠東新",
+        "2455": "全新",
+        "2382": "廣達",
+        "6505": "台塑化",
+        "00753L": "中信中國50正2",
+        "8046": "南電",
+        "00929": "復華台灣科技優息",
+        "3032": "偉訓",
+        "6116": "彩晶",
+        "00830": "國泰費城半導體",
+        "2371": "大同",
+        "3014": "聯陽",
+        "5880": "合庫金",
+        "1528": "恩德",
+        "5871": "中租-KY",
+        "2454": "聯發科",
+        "2834": "臺企銀",
+        "3045": "台灣大",
+        "00680L": "元大美債20正2",
+        "00715L": "期街口布蘭特正2",
+        "00940": "元大台灣價值高息",
+        "1808": "潤隆",
+        "2324": "仁寶",
+        "1504": "東元",
+        "2867": "三商壽",
+        "3090": "日電貿",
+        "3062": "建漢",
+        "9802": "鈺齊-KY",
+        "00915": "凱基優選高股息",
+        "3661": "世芯-KY",
+        "0056": "元大高股息",
+        "4977": "眾達-KY",
+        "2301": "光寶科",
+        "1514": "亞力",
+        "00882": "中信中國高股息",
+        "1904": "正隆",
+        "2637": "慧洋-KY",
+        "5284": "jpp-KY",
+        "2412": "中華電",
+        "3711": "日月光投控",
+        "6005": "群益證",
+        "00938": "凱基優選30",
+        "1316": "上曜",
+        "2889": "國票金",
+        "1513": "中興電"
+    }
+   # 創建一個反向映射
+    stock_name_to_code = {name: code for code, name in popular_stocks.items()}
+
+    # 合併所有股票代碼與名稱為單個正則表達式
+    all_patterns = "|".join([fr"\b{re.escape(code)}\b" for code in popular_stocks.keys()] +
+                            [re.escape(name) for name in popular_stocks.values()])
+    regex = re.compile(all_patterns)
+
+    # 讀取 CSV 檔案
+    df = pd.read_csv(file_path)
+
+    # 提取股票函數
+    def extract_stocks(content, regex, stock_dict, name_to_code_dict):
+        matches = regex.findall(str(content))
+        if matches:
+            unified_matches = set()
+            for match in matches:
+                if match in stock_dict:
+                    unified_matches.add(stock_dict[match])
+                elif match in name_to_code_dict:
+                    unified_matches.add(match)
+            return ", ".join(unified_matches) if unified_matches else ""
+        return ""
+
+    # 在 content 欄位中進行提取
+    if "content" in df.columns:
+        df["相關股票"] = df["content"].apply(lambda x: extract_stocks(x, regex, popular_stocks, stock_name_to_code))
+
+    # 篩選出包含股票的文章
+    result = df[df["相關股票"] != ""]
+
+    # 統計股票被提及次數
+    stock_counts = result["相關股票"].str.split(", ").explode().value_counts()
+
+    # 將股票代碼替換回股票名稱
+    stock_counts.index = stock_counts.index.map(lambda x: popular_stocks.get(x, x))
+
+    return stock_counts
+def main2():
+    st.title("PTT 股票討論熱度")
+    st.caption("資料來源：PTT-Stock")
+    # 讀取並處理資料
+    file_path = "ptt_stock_filtered_content.csv"
+    stock_counts = load_and_process_data(file_path)
+
+    stock_counts_sorted = stock_counts.sort_values(ascending=True)
+    
+    # 將排序後的結果放入 DataFrame，並重新排序索引
+    bottom_10_df = stock_counts_sorted.head(60).reset_index()
+    bottom_10_df.columns = ['股票', '討論次數']
+
+    # 重新排序後設置索引，保證視覺化順序正確
+    bottom_10_df = bottom_10_df.sort_values(by='討論次數', ascending=True)
+
+    # 使用 Streamlit 的 bar_chart 正確顯示
+    st.bar_chart(bottom_10_df.set_index('股票')['討論次數'])
+
+main2()
+
 st.title("市場情感判斷")
 sentiment_counts = {"positive": 0, "negative": 0}
 with st.container():
@@ -744,7 +907,7 @@ with st.expander("注意力機制 (Attention Mechanism) 介紹"):
 
 st.write("---")
 st.markdown("# 算法股價建議價格")
-st.markdown("### 深度捲機網路(DCNN)")
+st.markdown("### 深度卷積網路(2D CNN)")
 
 timestep = 10
 
