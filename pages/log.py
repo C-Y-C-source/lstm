@@ -43,4 +43,4 @@ with col1:
 with col2:
     # 返回主頁按鈕
     if st.button("返回主頁"):
-        st.experimental_rerun()  # 或者執行頁面跳轉邏輯
+        st.switch_page("server.py")  # 或者執行頁面跳轉邏輯
