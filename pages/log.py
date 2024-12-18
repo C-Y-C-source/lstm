@@ -1,5 +1,28 @@
 import streamlit as st
 import pandas as pd
+with st.sidebar:
+    st.header("聯絡資訊")
+    st.write("如果您有任何問題，請隨時聯繫我們！")
+
+    # 聯絡資訊
+    st.subheader("聯絡方式")
+    st.write("電子郵件: 411123002@gms.ndhu.edu.tw")
+    st.write("電話: 0800-000-050")
+    
+    st.write("---")
+    
+    # 其他側邊欄內容
+    st.subheader("網站導航")
+    st.write("[首頁](https://vskuzygkniaubvpqqbzoot.streamlit.app/)")
+    st.write("[Github](https://github.com/kkk-source)")
+    st.write("[FAQ](https://github.com/kkk-source/lstm/issues/1)")
+    st.write("[隱私政策](/privacy_policy)")
+    st.write("[更新日誌](/log)")
+    st.write("---")
+    
+    # 顯示版權資訊
+    st.text("© 2024 保留所有權利。")
+
 
 # 預設的更新日誌數據
 def load_default_logs():
