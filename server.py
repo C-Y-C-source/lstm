@@ -1072,7 +1072,7 @@ api_key = "AIzaSyCLvUf1gLc54ZF1aBttEz1AjAHi1Gddtv8"
 genai.configure(api_key=api_key)
 model_name = st.selectbox(
     "請選擇Gemini模型",
-    options=["gemini-2.0-flash-exp", "gemini-1.5-flash"],
+    options=["gemini-2.0-flash-exp", "gemini-1.5-flash","gemini-1.5-pro"],
     key="model_selector"
 )
 
