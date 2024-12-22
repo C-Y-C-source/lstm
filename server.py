@@ -1071,7 +1071,7 @@ st.markdown(
 api_key = "AIzaSyCLvUf1gLc54ZF1aBttEz1AjAHi1Gddtv8"
 genai.configure(api_key=api_key)
 
-model_name = "gemini-2.0-flash-experimental"
+model_name = "gemini-2.0-flash-exp"
 model = genai.GenerativeModel(model_name)
 
 # 初始化 session_state
