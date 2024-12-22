@@ -1028,7 +1028,7 @@ import streamlit as st
 
 # 設置標題
 st.title("有問題嗎?問問Gemini")
-st.caption("🚀power by gemini-2.0-flash-exp")
+st.caption("🚀power by gemini")
 with st.expander("如何申請 Gemini API 密鑰"):
     st.write("""
         要在你的應用程式中使用 Gemini API，你需要一個 API 密鑰。請依照以下步驟申請密鑰：
@@ -1076,8 +1076,8 @@ model_name = st.selectbox(
     key="model_selector"
 )
 
+st.caption(f"當前選擇的模型是: {model_name}")
 
-st.write(f"當前選擇的模型是: {model_name}")
 model = genai.GenerativeModel(model_name)
 
 # 初始化 session_state
