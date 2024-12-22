@@ -1070,8 +1070,14 @@ st.markdown(
 
 api_key = "AIzaSyCLvUf1gLc54ZF1aBttEz1AjAHi1Gddtv8"
 genai.configure(api_key=api_key)
+model_name = st.selectbox(
+    "請選擇Gemini模型",
+    options=["gemini-2.0-flash-exp", "gemini-1.5-flash"],
+    key="model_selector"
+)
 
-model_name = "gemini-2.0-flash-exp"
+
+st.write(f"當前選擇的模型是: {model_name}")
 model = genai.GenerativeModel(model_name)
 
 # 初始化 session_state
