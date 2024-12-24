@@ -455,11 +455,11 @@ import requests
 import pandas as pd
 from bs4 import BeautifulSoup
 import streamlit as st
-
 def csv_content():
     base_url = "https://www.ptt.cc/bbs/Stock/index.html"
     posts = []
     min_length = 50  # 最小內文長度限制
+    max_length = 2800  # 最大內文長度限制
     target_count = 60  # 目標文章數量
     progress = 0  # 初始進度
 
@@ -472,14 +472,13 @@ def csv_content():
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, 'html.parser')
             # 獲取符合條件的文章
-            new_posts = get_ptt_posts(soup, min_length)
+            new_posts = get_ptt_posts(soup, min_length, max_length)
             posts.extend(new_posts)
             
             # 更新進度條
             progress = min(len(posts) / target_count, 1.0)  # 確保進度不超過 100%
             progress_bar.progress(progress)
             status_text.text(f"已抓取文章數量：{len(posts)}/{target_count}")
-            deletedcontain=len(posts)-target_count
 
             # 如果總數已達目標數量，則結束
             if len(posts) >= target_count:
@@ -504,22 +503,29 @@ def csv_content():
     if posts:
         df = pd.DataFrame(posts)
         df.to_csv(r"ptt_stock_filtered_content.csv", index=False, encoding="utf-8-sig")
-        
-
     else:
         st.error("沒有抓取到任何文章")
-    return len(posts),deletedcontain
 
-def get_ptt_posts(soup, min_length):
-    """從 PTT 頁面解析符合條件的文章"""
+    deleted_contain = max(0, len(posts) - target_count)
+    return len(posts), deleted_contain
+
+def get_ptt_posts(soup, min_length, max_length=2800):
+    """
+    從 PTT 頁面解析符合條件的文章
+    :param soup: BeautifulSoup 對象
+    :param min_length: 最小內文長度限制
+    :param max_length: 最大內文長度限制（默認2800）
+    :return: 符合條件的文章列表
+    """
     data = soup.select("div.r-ent")
     result = []
     for item in data:
         try:
             # 抓取文章標題
             title = item.select_one("div.title").text.strip()
-            if "[公告]" in title:
+            if "[公告]" in title:  # 過濾公告類型文章
                 continue
+            
             # 抓取文章連結
             link_tag = item.select_one("div.title a")
             if link_tag:
@@ -531,19 +537,108 @@ def get_ptt_posts(soup, min_length):
                     full_content = article_soup.select_one("div#main-content").text.strip()
                     # 使用正則表達式提取正文內容
                     content_match = re.search(r"時間.*?\n(.*?)(?:--|$)", full_content, re.DOTALL)
-                    content = content_match.group(1).strip() if content_match else "無法提取內文"
+                    content = content_match.group(1).strip() if content_match else ""
                 else:
-                    content = "無法取得內容"
+                    continue  # 跳過無法獲取內容的文章
             else:
-                content = "無法取得內容"
+                continue  # 跳過無法獲取連結的文章
             
-            # 如果內文長度小於指定最小字數，則跳過
-            if len(content) >= min_length and  len(content)<2800:
+            # 過濾內文長度
+            if min_length <= len(content) <= max_length:
                 result.append({"title": title, "content": content})
         except Exception as e:
             print(f"發生錯誤：{e}")
-            continue
+            continue  # 忽略處理過程中的錯誤，繼續抓取其他文章
     return result
+
+# def csv_content():
+#     base_url = "https://www.ptt.cc/bbs/Stock/index.html"
+#     posts = []
+#     min_length = 50  # 最小內文長度限制
+#     target_count = 60  # 目標文章數量
+#     progress = 0  # 初始進度
+
+#     # Streamlit 進度條
+#     progress_bar = st.progress(progress)
+#     status_text = st.empty()
+
+#     while len(posts) < target_count:
+#         response = requests.get(base_url)
+#         if response.status_code == 200:
+#             soup = BeautifulSoup(response.text, 'html.parser')
+#             # 獲取符合條件的文章
+#             new_posts = get_ptt_posts(soup, min_length)
+#             posts.extend(new_posts)
+            
+#             # 更新進度條
+#             progress = min(len(posts) / target_count, 1.0)  # 確保進度不超過 100%
+#             progress_bar.progress(progress)
+#             status_text.text(f"已抓取文章數量：{len(posts)}/{target_count}")
+#             deletedcontain=len(posts)-target_count
+
+#             # 如果總數已達目標數量，則結束
+#             if len(posts) >= target_count:
+#                 posts = posts[:target_count]  # 只保留目標數量的文章
+#                 break
+
+#             # 找到上一頁的連結
+#             prev_link_tag = soup.find("a", class_="btn wide", string="‹ 上頁")
+#             if prev_link_tag:
+#                 prev_link = "https://www.ptt.cc" + prev_link_tag["href"]
+#                 base_url = prev_link
+#             else:
+#                 st.error("無法找到上一頁，停止爬取")
+#                 break
+#         else:
+#             st.error(f"無法取得網頁內容，HTTP 狀態碼：{response.status_code}")
+#             break
+
+#         time.sleep(0.5)  # 避免過於頻繁的請求
+
+#     # 匯出資料
+#     if posts:
+#         df = pd.DataFrame(posts)
+#         df.to_csv(r"ptt_stock_filtered_content.csv", index=False, encoding="utf-8-sig")
+        
+
+#     else:
+#         st.error("沒有抓取到任何文章")
+#     return len(posts),deletedcontain
+
+# def get_ptt_posts(soup, min_length):
+#     """從 PTT 頁面解析符合條件的文章"""
+#     data = soup.select("div.r-ent")
+#     result = []
+#     for item in data:
+#         try:
+#             # 抓取文章標題
+#             title = item.select_one("div.title").text.strip()
+#             if "[公告]" in title:
+#                 continue
+#             # 抓取文章連結
+#             link_tag = item.select_one("div.title a")
+#             if link_tag:
+#                 article_link = "https://www.ptt.cc" + link_tag["href"]
+#                 article_response = requests.get(article_link)
+#                 if article_response.status_code == 200:
+#                     article_soup = BeautifulSoup(article_response.text, 'html.parser')
+#                     # 抓取文章完整內容
+#                     full_content = article_soup.select_one("div#main-content").text.strip()
+#                     # 使用正則表達式提取正文內容
+#                     content_match = re.search(r"時間.*?\n(.*?)(?:--|$)", full_content, re.DOTALL)
+#                     content = content_match.group(1).strip() if content_match else "無法提取內文"
+#                 else:
+#                     content = "無法取得內容"
+#             else:
+#                 content = "無法取得內容"
+            
+#             # 如果內文長度小於指定最小字數，則跳過
+#             if len(content) >= min_length and  len(content)<2800:
+#                 result.append({"title": title, "content": content})
+#         except Exception as e:
+#             print(f"發生錯誤：{e}")
+#             continue
+#     return result
 
 def sen_ana(sentiment_counts):
     file_path=r'ptt_stock_filtered_content.csv'
