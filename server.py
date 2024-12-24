@@ -563,7 +563,7 @@ def sen_ana(sentiment_counts):
             content = content.lower()
             content = content.encode('utf-8', errors='ignore').decode('utf-8')
             #
-            if(((index + 1) / total_items)==12){
+            if(((index + 1) / total_items)==14){
                 st.caption(content)
                 st.caption(len(content))
             }
