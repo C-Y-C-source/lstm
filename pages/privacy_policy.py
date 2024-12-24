@@ -12,7 +12,7 @@ with st.sidebar:
     
     # 其他側邊欄內容
     st.subheader("網站導航")
-    st.write("[首頁](https://vskuzygkniaubvpqqbzoot.streamlit.app/)")
+    st.write("[首頁](https://stocksupporter.streamlit.app/)")
     st.write("[Github](https://github.com/kkk-source)")
     st.write("[FAQ](https://github.com/kkk-source/lstm/issues/1)")
     st.write("[隱私政策](/privacy_policy)")
