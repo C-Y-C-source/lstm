@@ -539,7 +539,7 @@ def get_ptt_posts(soup, min_length):
                 content = "無法取得內容"
             
             # 如果內文長度小於指定最小字數，則跳過
-            if len(content) >= min_length and  len(content)<2800:
+            if len(content) >= min_length and  len(content)<2000:
                 result.append({"title": title, "content": content})
         except Exception as e:
             print(f"發生錯誤：{e}")
