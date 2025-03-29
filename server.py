@@ -329,7 +329,7 @@ with st.sidebar:
     # 聯絡資訊
     st.subheader("聯絡方式")
     st.write("電子郵件: 411123002@gms.ndhu.edu.tw")
-    st.write("電話: 0800-000-050")
+
     
     st.write("---")
     
