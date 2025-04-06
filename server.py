@@ -590,7 +590,7 @@ def display_bar_chart(sentiment_counts):
         "backgroundColor": "#212121",
         "title": {
             "text": "情感分析統計",
-            "subtext": "資料來源PTT-STOCK",
+            "subtext": "資料來源:股票論壇",
             "x": "left",
             "textStyle": {
                 "color": "#f2f2f2"
