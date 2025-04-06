@@ -8,7 +8,7 @@ import torch
 import os
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as pltPTT-Stock
 import seaborn as sns
 from sklearn.preprocessing import MinMaxScaler
 import torch
@@ -789,8 +789,8 @@ def load_and_process_data(file_path):
 
     return stock_counts
 def main2():
-    st.title("PTT 股票討論熱度")
-    st.caption("資料來源：PTT-Stock")
+    st.title("股票論壇討論熱度")
+    st.caption("")
     # 讀取並處理資料
     file_path = "ptt_stock_filtered_content.csv"
     stock_counts = load_and_process_data(file_path)
