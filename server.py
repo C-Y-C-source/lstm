@@ -321,7 +321,7 @@ model_dcnn = cnn2dm()
 if st.session_state.dialog_open:
     disclaimer_dialog()
     
-st.write("---")
+
 
 import google.generativeai as genai
 import streamlit as st
@@ -405,6 +405,7 @@ if prompt := st.chat_input("LSTM是甚麼? 問問Gemini"):
             st.markdown(reply)
 
     st.session_state.messages.append({"role": "assistant", "content": reply})
+    st.write("---")
 with st.sidebar:
     st.header("聯絡資訊")
     st.write("如果您有任何問題，請隨時聯繫我們！")
