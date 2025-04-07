@@ -94,7 +94,7 @@ def disclaimer_dialog():
         st.rerun()  # 強制重新執行以移除對話框
 
 
- import google.generativeai as genai
+import google.generativeai as genai
 import streamlit as st
 
 # 設置標題
