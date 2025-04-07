@@ -916,9 +916,9 @@ with st.container():
                         #len_post,deletedcontain=csv_content()
     
 colsuccess, colwarning = st.columns(2)
-
-with colsuccess:
-    st.success(f"資料已成功匯出點擊更新情感以更新有效文章情感統計：{len_post}")
+if clicked1:
+    with colsuccess:
+        st.success(f"資料已成功匯出點擊更新情感以更新有效文章情感統計：{len_post}")
 
 
 if clicked2:
