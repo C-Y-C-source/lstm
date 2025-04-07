@@ -565,6 +565,7 @@ def csv_content():
             progress_bar.progress(progress)
             status_text.text(f"已抓取文章數量：{len(posts)}/{target_count}")
             deletedcontain=len(posts)-target_count
+            
 
             # 如果總數已達目標數量，則結束
             if len(posts) >= target_count:
@@ -580,7 +581,7 @@ def csv_content():
                 st.error("無法找到上一頁，停止爬取")
                 break
         else:
-            st.error(f"無法取得網頁內容，HTTP 狀態碼：{response.status_code}")
+            st.error(f"無法取得完整網頁內容，HTTP 狀態碼：{response.status_code}")
             break
 
         time.sleep(0.5)  # 避免過於頻繁的請求
@@ -899,12 +900,12 @@ with st.container():
     col1, col2 = st.columns(2)
 
     with col1:
-        clicked1 = st.button("更新文章", help="更新最近 60 篇有效文章")
+        clicked1 = st.button("更新文章", help="更新最近最多 60 篇有效文章")
         if clicked1:
             len_post,deletedcontain=csv_content()
     
     with col2:
-        clicked2 = st.button("更新情感統計", help="更新最近 60 篇有效文章情感統計")
+        clicked2 = st.button("更新情感統計", help="更新最近最多 60 篇有效文章情感統計")
         if clicked2:
             
             results=sen_ana(sentiment_counts)
@@ -915,11 +916,10 @@ with st.container():
                         #len_post,deletedcontain=csv_content()
     
 colsuccess, colwarning = st.columns(2)
-if clicked1:
-    with colsuccess:
-        st.success(f"資料已成功匯出點擊更新情感以更新有效文章情感統計：{len_post}")
-    with colwarning:
-        st.warning(f"已刪除{deletedcontain}篇不合要求之文章")
+
+with colsuccess:
+    st.success(f"資料已成功匯出點擊更新情感以更新有效文章情感統計：{len_post}")
+
 
 if clicked2:
     sentiment_df = pd.DataFrame(results)
