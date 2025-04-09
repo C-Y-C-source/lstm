@@ -487,7 +487,7 @@ LSTM 由以下幾個主要部分組成：
    - 根據單元狀態和當前輸入，決定輸出多少信息到下個時間步。
 
 #### LSTM 的優點
-- **解決梯度消失問題：** 相比於傳統的 RNN，LSTM 可以捕捉長期依賴，並且能夠防止梯度消失問題。
+- **解決梯度消失問題：** 相比於傳統的 RNN，LSTM 可捕捉長期依賴，並且能夠防止梯度消失問題。
 - **時間序列預測：** LSTM 特別適合處理時間序列數據，比如語音識別、語言建模等。
 
 #### LSTM 的應用領域
@@ -918,7 +918,7 @@ with st.container():
 colsuccess, colwarning = st.columns(2)
 if clicked1:
     with colsuccess:
-        st.success(f"資料已成功匯出點擊更新情感以更新有效文章情感統計：{len_post}")
+        st.success(f"資料已成功匯出點擊更新情感已更新有效文章情感統計：{len_post}")
 
 
 if clicked2:
