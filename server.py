@@ -399,8 +399,7 @@ def cnn2dm():
 
 model_dcnn = cnn2dm()
 # 主邏輯
-if st.session_state.dialog_open:
-    disclaimer_dialog()
+
     
 
 
