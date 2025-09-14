@@ -404,7 +404,7 @@ model_dcnn = cnn2dm()
 
 
 
-    st.write("---")
+
 with st.sidebar:
     st.header("聯絡資訊")
     st.write("如果您有任何問題，請隨時聯繫我們！")
