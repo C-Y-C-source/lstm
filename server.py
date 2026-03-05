@@ -139,7 +139,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-api_key = "AIzaSyDcyKGUd_-fN2vWQ1GPGdDQcZeTRSGi3vY"
+api_key = ""
 genai.configure(api_key=api_key)
 model_name = st.selectbox(
     "請選擇Gemini模型",
